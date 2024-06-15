@@ -1,11 +1,11 @@
-import express from 'express';
+import express from "express";
 
 const server = express();
 
-server.get('/', (req, res) =>{
+interface Teste {}
 
-    return res.send("Application is running")
+server.get("/", (_, res) => {
+    return res.send("Application is running");
+});
 
-})
-
-export {server}
+export { server };
