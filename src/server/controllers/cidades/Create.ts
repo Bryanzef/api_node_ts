@@ -1,38 +1,32 @@
 import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
+import { validation } from "../../shared/middlewares";
 import * as yup from "yup";
 
-// Definindo a interface para a cidade
 interface ICidade {
     nome: string;
     estado: string;
 }
 
-// Esquema de validação usando yup
-const bodyValidation: yup.ObjectSchema<ICidade> = yup
-    .object()
-    .shape({
-        nome: yup.string().required().min(3),
-        estado: yup.string().required().min(3),
-    })
-    .defined();
+interface IFilter {
+    filter?: string;
+}
 
-// Função para criar uma cidade
+export const createValidation = validation(getSchema => ({
+    body: getSchema<ICidade>(
+        yup.object().shape({
+            nome: yup.string().required().min(3),
+            estado: yup.string().required().min(3),
+        })
+    ),
+    query: getSchema<IFilter>(
+        yup.object().shape({
+            filter: yup.string().required().min(3),
+        })
+    ),
+}));
+
 export const create = async (req: Request<{}, {}, ICidade>, res: Response) => {
-    let validateData: ICidade | undefined = undefined;
-    try {
-        validateData = await bodyValidation.validate(req.body, { abortEarly: false });
-    } catch (err) {
-        const yupError = err as yup.ValidationError;
-        const errors: Record<string, string> = {};
+    console.log(req.body);
 
-        yupError.inner.forEach(error => {
-            if (error.path === undefined) return;
-            errors[error.path] = error.message;
-        });
-
-        return res.status(StatusCodes.BAD_REQUEST).json({ errors });
-    }
-
-    console.log(validateData);
+    return res.status(200).send("Create!");
 };
